@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <script src="openpgp.min.js"></script>
+  <script src="particles.js"></script>
+  <script src="baffle.js"></script>
+  <head>
+    <title>WebGPG</title>
+    <link type="text/css" rel="stylesheet" href="style.css"/>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <script>particlesJS.load('particles-js', 'particles.json', function() {
+        console.log('callback - particles.js config loaded');
+      });</script>    
+  </head>
+
+
+  <body style="background-color: black">
+    <div id="particles-js" width=100% height=100%>
+      <div class="content">
+        <h1><font color="silver"><span class="baffle"># WebGPG</span></font></h1>
+
+        <div class="message">
+          <h2><font color="silver">$ Message to encrypt</font></h2>
+          <textarea rows="5"></textarea>
+        </div>
+
+        <br>
+
+        <div id="public-keys">
+          <div class="public-key">
+            <h2><font color="silver">$ Public key</font></h2>
+            <p class="hint">$ Only the person who has a private key will be able to decrypt the message.</p>
+            <textarea rows="5"></textarea>
+          </div>
+        </div>
+
+        <div id="private-key">
+          <h2>Private Key</h2>
+          <textarea rows="5"></textarea>
+          <h2>Passphrase</h2>
+          <textarea rows="2"></textarea>
+        </div>
+        
+        <font color="silver"><pre id="output" class="cypher" width="500px"></pre></font>
+        <button id="encrypt">./encrypt.sh</button>
+
+        <script>
+
+          let a = baffle('.baffle', {
+          characters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#####$$$$',
+          speed: 80
+          }).start();
+          a.reveal(1500);
+
+        const query = query => document.querySelector(query);
+        const queryAll = query => Array.prototype.slice.apply(document.querySelectorAll(query));
+        const publicKeyTemplate = query('#public-keys').innerHTML;
+
+        function getKey(textarea, type) {
+          const { value } = textarea;
+          if (!value) {
+            throw new Error(`${type} key missing`);
+          }
+          return openpgp.key.readArmored(value).keys[0];
+        }
+        function getPrivateKey() {
+          if (query('#private-key').className !== 'visible') {
+            return Promise.resolve();
+          }
+          const [key, passphrase] = queryAll('#private-key textarea');
+          return openpgp.decryptKey({
+            privateKey: getKey(key, 'private'),
+            passphrase: passphrase.value,
+          })
+          .then(({key}) => key)
+          ;
+        }
+        query('#encrypt').addEventListener('click', () => {
+          getPrivateKey().then(privateKey => {
+            const options = {
+              data: query('.message textarea').value,
+              publicKeys: queryAll('.public-key textarea').map(el => getKey(el, 'public')),
+              privateKey: privateKey,
+              armor: true,
+            };
+            return openpgp.encrypt(options).then(results => {
+              query('#output').innerHTML = results.data;
+              let b = baffle('.cypher', {
+              characters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=+/',
+              speed: 80
+              }).start();
+              b.reveal(1500);
+            });
+          })
+          .catch(err => alert(err.message))
+          ;
+        });
+        </script>
+
+        <p>
+          <font color="silver">
+          This page uses industry vetted open source <a href="https://github.com/openpgpjs/openpgpjs">OpenPGP.js</a> and does not submit anything to any server. 
+          Everything happens in your browser and is completely lost when you close this page.
+          </font>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
