@@ -10,9 +10,34 @@
 
     .content {
       max-width: 500px;
-      margin: auto;
+      position: absolute;
+      margin-left: auto;
+      margin-right: auto;
+      left: 0;
+      right: 0;
+      }
+
+    canvas {
+      display:block;
+      background: #000000;
+      position: fixed;
+      z-index: -1;
     }
-    
+
+    .cypher {
+      max-width: 500px;
+    }
+
+    .allignleft {
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    .alligncenter {
+      text-align: center;
+      font-size: 1rem;
+    }
+
     textarea {
       width: 500px;
       border: 1px solid silver;
@@ -42,7 +67,10 @@
       display: none;
     }
 
-    
+    #copybtn {
+      display: none;
+    }
+
     #private-key.visible {
       display: block;
     }

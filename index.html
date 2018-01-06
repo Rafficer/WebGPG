@@ -1,20 +1,36 @@
 <!DOCTYPE html>
+
+<!-- 
+  Why are you here? If you just clicked on view-source or through the github repo and don't actually know what you are doing: 
+    Hey! Enjoy your stay. Breakfast and midnight snacks are not included. Clean the toilet after use. Thanks.
+  
+  For anyone else: 
+    Since the MIT license basically says I am not accountable for anything that my code fucks up, don't even try to sue me for
+    your health conditions after reading through it. 
+  Known side effects: 
+    Fever, sweats, chills, rage, crippling depression, increased sleepiness, decreased sleepiness, normal sleepiness.
+  Only consume with the supervision of an adult. Cheers.
+ -->
 <html>
+  <!-- sourcing the 3rd party scripts needed --> 
   <script src="openpgp.min.js"></script>
   <script src="particles.js"></script>
   <script src="baffle.js"></script>
+  
+  <!-- Basic HTML head. Also loading the background particles... It shouldn't be here, I know... But it was the first place where it worked properly :) --> 
   <head>
     <title>WebGPG</title>
-    <link type="text/css" rel="stylesheet" href="style.css"/>
+    <link type="text/css" rel="stylesheet" href="style.css" media="screen,projection"/>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <script>particlesJS.load('particles-js', 'particles.json', function() {
         console.log('callback - particles.js config loaded');
       });</script>    
   </head>
 
+  <!-- HTML stuff... You know... Like... Characters and buttons and textboxes and all the good stuff... -->
+  <body style="background-color: black" >
+    <div id="particles-js">
 
-  <body style="background-color: black">
-    <div id="particles-js" width=100% height=100%>
       <div class="content">
         <h1><font color="silver"><span class="baffle"># WebGPG</span></font></h1>
 
@@ -28,7 +44,7 @@
         <div id="public-keys">
           <div class="public-key">
             <h2><font color="silver">$ Public key</font></h2>
-            <p class="hint">$ Only the person who has a private key will be able to decrypt the message.</p>
+            <p class="hint">$ Only the person with the private key will be able to decrypt the message.</p>
             <textarea rows="5"></textarea>
           </div>
         </div>
@@ -40,21 +56,25 @@
           <textarea rows="2"></textarea>
         </div>
         
-        <font color="silver"><pre id="output" class="cypher" width="500px"></pre></font>
+        <font color="silver"><pre id="output" class="cypher"></pre></font>
         <button id="encrypt">./encrypt.sh</button>
+        <button id="copybtn">./copytoclipboard.py</button>
 
+
+        <!-- https://i.imgur.com/CmqhpYs.png. --> 
         <script>
-
           let a = baffle('.baffle', {
           characters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#####$$$$',
           speed: 80
           }).start();
-          a.reveal(1500);
+          a.reveal(1500, 700);
 
+        //Who want's some variables? You only pay 100% of the initial price if you purchase 2!
         const query = query => document.querySelector(query);
         const queryAll = query => Array.prototype.slice.apply(document.querySelectorAll(query));
         const publicKeyTemplate = query('#public-keys').innerHTML;
-
+        
+        //honestly, I have no fucking idea. It works, so it's okay, I guess... I think it checks the key or something like that... whatever...
         function getKey(textarea, type) {
           const { value } = textarea;
           if (!value) {
@@ -62,6 +82,8 @@
           }
           return openpgp.key.readArmored(value).keys[0];
         }
+
+        //Still no idea...
         function getPrivateKey() {
           if (query('#private-key').className !== 'visible') {
             return Promise.resolve();
@@ -74,6 +96,8 @@
           .then(({key}) => key)
           ;
         }
+
+        //Encrypt the message with the private key when the button 'encrypt' is clicked
         query('#encrypt').addEventListener('click', () => {
           getPrivateKey().then(privateKey => {
             const options = {
@@ -82,13 +106,21 @@
               privateKey: privateKey,
               armor: true,
             };
+            //show encrypted message
             return openpgp.encrypt(options).then(results => {
               query('#output').innerHTML = results.data;
+
+              //Baffle encrypted message before displaying
               let b = baffle('.cypher', {
               characters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=+/',
               speed: 80
               }).start();
               b.reveal(1500);
+
+               //Show the 'copy to clipboard' button. (disabled cause it's not implemented yet)
+              //var copybuttonID = document.getElementById("copybtn");{
+              //  copybuttonID.style.display = "block";
+              //}
             });
           })
           .catch(err => alert(err.message))
@@ -96,10 +128,18 @@
         });
         </script>
 
-        <p>
+        <!-- Bottom Disclaimer/Info -->
+        <p class="allignleft">
           <font color="silver">
-          This page uses industry vetted open source <a href="https://github.com/openpgpjs/openpgpjs">OpenPGP.js</a> and does not submit anything to any server. 
+          This page uses the industry vetted, open-source OpenPGP library <a href="https://github.com/openpgpjs/openpgpjs">OpenPGP.js</a> and does not submit anything to any server. 
           Everything happens in your browser and is completely lost when you close this page.
+          </font>
+        </p>
+
+        <!-- Links --> 
+        <p class="alligncenter">
+          <font color="silver">
+            <a href=https://github.com/rafficer/WebGPG>SOURCE</a> | <a href=https://github.com/rafficer/WebGPG>SOURCE</a>
           </font>
         </p>
       </div>
