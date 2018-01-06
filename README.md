@@ -1,10 +1,8 @@
-# GPG-online
+# WebGPG
 
-This is a <a href="http://alexgorbatchev.github.io/gpg-online/">client side page</a> that allows you to easily PGP encrypt a message using one or more public keys and, optionally, a private key.
+Webapp that allows you to encrypt text with a PGP Public key to send it via E-Mail.
 
 Uses <a href="https://github.com/openpgpjs/openpgpjs">OpenPGP.js</a>.
+Main code based on <a href="https://github.com/alexgorbatchev/gpg-online/">alexgorbatchev/gpg-online</a>
 
-## License
-
-MIT
 
