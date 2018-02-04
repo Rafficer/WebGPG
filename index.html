@@ -110,12 +110,12 @@
             return openpgp.encrypt(options).then(results => {
               query('#output').innerHTML = results.data;
 
-              //Baffle encrypted message before displaying
-              let b = baffle('.cypher', {
-              characters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=+/',
-              speed: 80
-              }).start();
-              b.reveal(1500);
+              //Baffle encrypted message before displaying (disabled cause lag when the message is too long.)
+              //  let b = baffle('.cypher', {
+              //  characters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=+/',
+              //  speed: 80
+              //  }).start();
+              //  b.reveal(1500);
 
                //Show the 'copy to clipboard' button. (disabled cause it's not implemented yet)
               //var copybuttonID = document.getElementById("copybtn");{
