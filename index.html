@@ -12,6 +12,9 @@
   Only consume with the supervision of an adult. Cheers.
  -->
 <html>
+  <header>
+      <meta charset="utf-8"/>
+  </header>
   <!-- sourcing the 3rd party scripts needed --> 
   <script src="openpgp.min.js"></script>
   <script src="particles.js"></script>
@@ -76,6 +79,22 @@
           }
           return openpgp.key.readArmored(value).keys[0];
         }
+        
+        function selectElementText(el, win) {
+            win = win || window;
+            var doc = win.document, sel, range;
+            if (win.getSelection && doc.createRange) {
+                sel = win.getSelection();
+                range = doc.createRange();
+                range.selectNodeContents(el);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else if (doc.body.createTextRange) {
+                range = doc.body.createTextRange();
+                range.moveToElementText(el);
+                range.select();
+            }
+        }
 
 	query('#add-public-key').addEventListener('click', () => {
 	  const element = document.createElement('div');
@@ -100,6 +119,12 @@
           })
           .catch(err => alert(err.message))
           ;
+        });
+        
+        query('#copybtn').addEventListener('click', () => {
+            selectElementText(query("#output"));
+            /* Copy the text inside the text field */
+              document.execCommand("Copy");
         });
         </script>
 
