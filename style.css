@@ -67,10 +67,6 @@
       display: none;
     }
 
-    #copybtn {
-      display: none;
-    }
-
     #private-key.visible {
       display: block;
     }

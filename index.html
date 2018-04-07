@@ -12,6 +12,9 @@
   Only consume with the supervision of an adult. Cheers.
  -->
 <html>
+  <header>
+      <meta charset="utf-8"/>
+  </header>
   <!-- sourcing the 3rd party scripts needed --> 
   <script src="openpgp.min.js"></script>
   <script src="particles.js"></script>
@@ -49,14 +52,8 @@
           </div>
         </div>
 
-        <div id="private-key">
-          <h2>Private Key</h2>
-          <textarea rows="5"></textarea>
-          <h2>Passphrase</h2>
-          <textarea rows="2"></textarea>
-        </div>
-        
         <font color="silver"><pre id="output" class="cypher"></pre></font>
+	<button id="add-public-key">Add Public Key</button>
         <button id="encrypt">./encrypt.sh</button>
         <button id="copybtn">./copytoclipboard.py</button>
 
@@ -82,24 +79,33 @@
           }
           return openpgp.key.readArmored(value).keys[0];
         }
-
-        //Still no idea...
-        function getPrivateKey() {
-          if (query('#private-key').className !== 'visible') {
-            return Promise.resolve();
-          }
-          const [key, passphrase] = queryAll('#private-key textarea');
-          return openpgp.decryptKey({
-            privateKey: getKey(key, 'private'),
-            passphrase: passphrase.value,
-          })
-          .then(({key}) => key)
-          ;
+        
+        function selectElementText(el, win) {
+            win = win || window;
+            var doc = win.document, sel, range;
+            if (win.getSelection && doc.createRange) {
+                sel = win.getSelection();
+                range = doc.createRange();
+                range.selectNodeContents(el);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else if (doc.body.createTextRange) {
+                range = doc.body.createTextRange();
+                range.moveToElementText(el);
+                range.select();
+            }
         }
+
+	query('#add-public-key').addEventListener('click', () => {
+	  const element = document.createElement('div');
+	  element.innerHTML = publicKeyTemplate;
+	  query('#public-keys').appendChild(element);
+	});
+
 
         //Encrypt the message with the private key when the button 'encrypt' is clicked
         query('#encrypt').addEventListener('click', () => {
-          getPrivateKey().then(privateKey => {
+          Promise.resolve().then(privateKey => {
             const options = {
               data: query('.message textarea').value,
               publicKeys: queryAll('.public-key textarea').map(el => getKey(el, 'public')),
@@ -109,22 +115,16 @@
             //show encrypted message
             return openpgp.encrypt(options).then(results => {
               query('#output').innerHTML = results.data;
-
-              //Baffle encrypted message before displaying (disabled cause lag when the message is too long.)
-              //  let b = baffle('.cypher', {
-              //  characters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=+/',
-              //  speed: 80
-              //  }).start();
-              //  b.reveal(1500);
-
-               //Show the 'copy to clipboard' button. (disabled cause it's not implemented yet)
-              //var copybuttonID = document.getElementById("copybtn");{
-              //  copybuttonID.style.display = "block";
-              //}
             });
           })
           .catch(err => alert(err.message))
           ;
+        });
+        
+        query('#copybtn').addEventListener('click', () => {
+            selectElementText(query("#output"));
+            /* Copy the text inside the text field */
+              document.execCommand("Copy");
         });
         </script>
 
