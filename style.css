@@ -33,6 +33,10 @@
       font-size: 1rem;
     }
 
+    #sigoutput {
+      font-size: 30px
+    }
+
     .alligncenter {
       text-align: center;
       font-size: 1rem;

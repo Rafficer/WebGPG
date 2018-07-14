@@ -38,7 +38,7 @@
         <h1><font color="silver"><span class="baffle"># WebGPG</span></font></h1>
 
         <div class="message">
-          <h2><font color="silver">$ Message to encrypt</font></h2>
+          <h2><font color="silver">$ Message to encrypt/verify</font></h2>
           <textarea rows="5"></textarea>
         </div>
 
@@ -46,16 +46,20 @@
 
         <div id="public-keys">
           <div class="public-key">
-            <h2><font color="silver">$ Public key</font></h2>
-            <p class="hint">$ Only the person with the private key will be able to decrypt the message.</p>
+            <h2><font color="silver">$ Public Key</font></h2>
+            <p class="hint">$ Only the person with the private key will be able to decrypt the message</p>
+            <p class="hint">$ or create a valid signature.</p>
             <textarea rows="5"></textarea>
           </div>
         </div>
 
         <font color="silver"><pre id="output" class="cypher"></pre></font>
-	<button id="add-public-key">Add Public Key</button>
+        <font color="silver"><pre id="sigoutput" class="cypher"></pre></font>
         <button id="encrypt">./encrypt.sh</button>
+        <button id="verify">./verify_sig</button>
+        <br>
         <button id="copybtn">./copytoclipboard.py</button>
+        <button id="add-public-key">Add Public Key</button>
 
 
         <!-- https://i.imgur.com/CmqhpYs.png. --> 
@@ -71,7 +75,6 @@
         const queryAll = query => Array.prototype.slice.apply(document.querySelectorAll(query));
         const publicKeyTemplate = query('#public-keys').innerHTML;
         
-        //honestly, I have no fucking idea. It works, so it's okay, I guess... I think it checks the key or something like that... whatever...
         function getKey(textarea, type) {
           const { value } = textarea;
           if (!value) {
@@ -125,6 +128,23 @@
             selectElementText(query("#output"));
             /* Copy the text inside the text field */
               document.execCommand("Copy");
+        });
+        query('#verify').addEventListener('click', () => {
+        //Verify Signature when the button 'verify_sig' is clicked
+        options = {
+    message: openpgp.cleartext.readArmored(query('.message textarea').value), // parse armored message
+    publicKeys: queryAll('.public-key textarea').map(el => getKey(el, 'public'))   // for verification
+};
+  openpgp.verify(options).then(function(verified) {
+    validity = verified.signatures[0].valid; // true
+    if (validity) {
+        query('#sigoutput').innerHTML = "Signature Valid ✅ <br>KeyID: " + verified.signatures[0].keyid.toHex();
+    }
+    else if (!validity){
+      query('#sigoutput').innerHTML = "❌ Signature Invalid ❌";
+    }
+    
+  });
         });
         </script>
 
